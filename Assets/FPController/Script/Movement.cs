@@ -7,6 +7,7 @@ public class Movement : MonoBehaviour {
     private CharacterController CController;
 
     public float PlayerSpeed = 12f;
+    public float RunningMult = 1f;
     public float Gravity = -9.81f;
 
     private Vector3 FallVelocity;
@@ -17,6 +18,8 @@ public class Movement : MonoBehaviour {
     public LayerMask GroundMask;
 
     bool isGrounded;
+    bool isRunning;
+    
 
     void Start(){
         CController = GetComponent<CharacterController>();
@@ -43,20 +46,28 @@ public class Movement : MonoBehaviour {
             float HorizontalAxis = Input.GetAxisRaw("Horizontal") ;
             float VerticalAxis = Input.GetAxisRaw("Vertical");
 
+            if (Input.GetButtonDown("Run") && isGrounded) {
+                RunningMult = 2f; isRunning = true;
+            }
+            if(Input.GetButtonUp("Run")){
+                RunningMult = 1f; isRunning = false;
+            }
+
             Vector3 MoveVector = transform.right * HorizontalAxis + transform.forward * VerticalAxis;
-            CController.Move(MoveVector.normalized * PlayerSpeed * Time.deltaTime);
+            CController.Move(MoveVector.normalized * (PlayerSpeed*RunningMult) * Time.deltaTime);
 
             //Jump
             if(Input.GetButtonDown("Jump") && isGrounded) {
                 CController.slopeLimit = 91.0f;
                 FallVelocity.y = Mathf.Sqrt(JumpHeight * -1f * Gravity);
+                if(isRunning){ RunningMult = 1f; isRunning = false; }
             }
 
             //Fall movement
             FallVelocity.y += Gravity * Time.deltaTime;
             CController.Move(FallVelocity * Time.deltaTime);
 
-        } else {
+        }else{
             Debug.LogError("<color=red>GameObject <color=blue>" + gameObject.name + "</color> error:  no CharacterController found</color>");
             enabled = false;
         }
