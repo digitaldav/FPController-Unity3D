@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ObjectDetection : MonoBehaviour {
 
-    private RaycastHit RHit;
+    private RaycastHit RHit, RSelected;
     private Ray ray;
 
     public float distance = 3f;
@@ -37,20 +37,20 @@ public class ObjectDetection : MonoBehaviour {
             ObjectText.text = "Press X to return";
             ObjectText.enabled = true;
 
-            if (RHit.collider.gameObject.GetComponent<ObjectMovement>() != null) {
-                RHit.collider.gameObject.GetComponent<ObjectMovement>().enabled = true;
+            if (RSelected.collider.gameObject.GetComponent<ObjectMovement>() != null) {
+                RSelected.collider.gameObject.GetComponent<ObjectMovement>().enabled = true;
             }
 
-            if (Input.GetKeyDown(KeyCode.X) && InspectMode) {
+            if (Input.GetButtonDown("ExitInspect") && InspectMode) {
                 MScript.enabled = true; 
                 CameraScript.enabled = true;
 
-                if(RHit.collider.gameObject.GetComponent<ObjectMovement>()!=null){
-                    RHit.collider.gameObject.GetComponent<ObjectMovement>().enabled = false;
+                if(RSelected.collider.gameObject.GetComponent<ObjectMovement>()!=null){
+                    RSelected.collider.gameObject.GetComponent<ObjectMovement>().enabled = false;
                 }
 
-                RHit.transform.eulerAngles = ObjectRotation;
-                RHit.transform.position = ObjectPosition;
+                RSelected.transform.eulerAngles = ObjectRotation;
+                RSelected.transform.position = ObjectPosition;
 
                 InspectMode = false;
             }
@@ -59,10 +59,7 @@ public class ObjectDetection : MonoBehaviour {
     }
 
 
-    /* Pending: 
-     * - Add SelectedObject variable to avoid weird things
-     * - Replace GetKeyDown -> GetButtonDown
-     */
+
     void Update()  {
 
         if (!InspectMode) {
@@ -77,12 +74,12 @@ public class ObjectDetection : MonoBehaviour {
                 ObjectText.text = "Press F to inspect "+RHit.collider.gameObject.name;
                 ObjectText.enabled = true;
 
-                if (Input.GetKeyDown(KeyCode.F) && !InspectMode) {
+                if (Input.GetButtonDown("Inspect") && !InspectMode) {
                     InspectMode = true;
-
-                    ObjectPosition = RHit.transform.position;
-                    ObjectRotation = RHit.transform.eulerAngles;
-                    RHit.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 1f;
+                    RSelected = RHit;
+                    ObjectPosition = RSelected.transform.position;
+                    ObjectRotation = RSelected.transform.eulerAngles;
+                    RSelected.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 1f;
                 }
 
             } else {

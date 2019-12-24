@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectMovement : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
+public class ObjectMovement : MonoBehaviour {
+
+    float RotationXClamp;
+    float RotationyYClamp;
+
+    void Start()  {
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+
+    void Update() {
         float XAxis = Input.GetAxis("Mouse X") * 100f * Time.deltaTime;
         float YAxis = Input.GetAxis("Mouse Y") * 100f * Time.deltaTime;
 
+        RotationXClamp -= YAxis;
+        RotationyYClamp -= XAxis;
 
-        transform.Rotate(Vector3.down * XAxis);
-        transform.Rotate(Vector3.right * YAxis);
+        transform.localRotation = Quaternion.Euler(RotationXClamp, RotationyYClamp, 0f);
     }
 }

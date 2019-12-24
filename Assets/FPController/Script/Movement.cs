@@ -19,21 +19,59 @@ public class Movement : MonoBehaviour {
 
     bool isGrounded;
     bool isRunning;
-    
+
+    private float PlayerHeight;
+    public float CrouchHeight = 1.4f;
+    public float CrouchSpeed = 6f;
+    private float CrouchMult = 1f;
+
+    private RaycastHit objectHit;
+    bool CrouchNeeded;
 
     void Start(){
         CController = GetComponent<CharacterController>();
+
+        if (CController != null) {
+            PlayerHeight = CController.height;
+        }
     }
 
 
     void Update() {
 
         if (CController != null) {
-
+            
             if(GroundCheckTransform == null) {
                 Debug.LogError("<color=red>GameObject <color=blue>" + gameObject.name + "</color> error:  no GroundCheckTranform attached</color>");
                 enabled = false;
             }
+
+            if ((Input.GetButton("Crouch") || CrouchNeeded) && !isRunning) {
+                CController.height = Mathf.Lerp(CController.height, CrouchHeight, Time.deltaTime * 5);
+                CrouchMult = 0.5f;
+            } else {
+                Vector3 fwd = transform.TransformDirection(Vector3.up);
+                Debug.DrawRay(transform.position, fwd * (PlayerHeight - CrouchHeight), Color.green);
+                if (Physics.Raycast(transform.position, fwd, out objectHit, (PlayerHeight - CrouchHeight))) {
+                    CrouchNeeded = true;
+                } else {
+                    CrouchNeeded = false;
+                }
+
+                CController.height = Mathf.Lerp(CController.height, PlayerHeight, Time.deltaTime * 5);
+                CrouchMult = 1f;
+            }
+
+            if (CrouchNeeded) {
+                Vector3 fwd = transform.TransformDirection(Vector3.up);
+                Debug.DrawRay(transform.position, fwd * (PlayerHeight - CrouchHeight), Color.green);
+                if (Physics.Raycast(transform.position, fwd, out objectHit, (PlayerHeight - CrouchHeight))) {
+                    CrouchNeeded = true;
+                } else {
+                    CrouchNeeded = false;
+                }
+            }
+            
 
             //Ground check
             isGrounded = Physics.CheckSphere(GroundCheckTransform.position, GroundDistance, GroundMask);
@@ -54,7 +92,7 @@ public class Movement : MonoBehaviour {
             }
 
             Vector3 MoveVector = transform.right * HorizontalAxis + transform.forward * VerticalAxis;
-            CController.Move(MoveVector.normalized * (PlayerSpeed*RunningMult) * Time.deltaTime);
+            CController.Move(MoveVector.normalized * (PlayerSpeed*RunningMult* CrouchMult) * Time.deltaTime);
 
             //Jump
             if(Input.GetButtonDown("Jump") && isGrounded) {
