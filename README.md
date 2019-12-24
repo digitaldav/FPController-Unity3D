@@ -1,7 +1,11 @@
 # FPController-Unity3D
 A very basic first person controller for Unity3D.
 <br>
-At this time, it only has basic mechanics: move, look, jump and zoom.
+Mechanics: 
+- Jump. 
+- Camera zoom.
+- Inspect objects.
+- Crouch.
 <br>
 To use it just drag the prefab to your scene.
 <br>
