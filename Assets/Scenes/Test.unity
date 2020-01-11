@@ -1166,5 +1166,15 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8933535673296673640, guid: bf2fadae1b6b72442b89f43d3f3bbfad,
+        type: 3}
+      propertyPath: near clip plane
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 8933535673296673646, guid: bf2fadae1b6b72442b89f43d3f3bbfad,
+        type: 3}
+      propertyPath: Sensibility
+      value: 120
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf2fadae1b6b72442b89f43d3f3bbfad, type: 3}

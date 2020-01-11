@@ -26,7 +26,7 @@ public class Movement : MonoBehaviour {
     private float CrouchMult = 1f;
 
     private RaycastHit objectHit;
-    bool CrouchNeeded;
+    bool isCrouch = false;
 
     void Start(){
         CController = GetComponent<CharacterController>();
@@ -37,6 +37,53 @@ public class Movement : MonoBehaviour {
     }
 
 
+    void CrouchPress() {
+        if ((Input.GetButtonDown("Crouch")) && !isRunning) {
+            isCrouch = !isCrouch;
+        }
+
+        if (isCrouch) {
+            CController.height = Mathf.Lerp(CController.height, CrouchHeight, Time.deltaTime * 5);
+            CrouchMult = 0.5f;
+        } else {
+
+            Vector3 fwd = transform.TransformDirection(Vector3.up);
+            if (Physics.Raycast(transform.position, fwd, out objectHit, (PlayerHeight - CrouchHeight))) {
+                //isCrouch = true; //Auto crouch
+            } else {
+                CController.height = Mathf.Lerp(CController.height, PlayerHeight, Time.deltaTime * 5);
+                CrouchMult = 1f;
+            }
+
+        }
+    }
+
+
+    void CrouchHold() {
+
+        if ((Input.GetButton("Crouch")) && !isRunning) {
+            CController.height = Mathf.Lerp(CController.height, CrouchHeight, Time.deltaTime * 5);
+            CrouchMult = 0.5f;
+        }else{
+            if(CController.height+1 < PlayerHeight) {
+                Vector3 fwd = transform.TransformDirection(Vector3.up);
+                Debug.DrawRay(transform.position, fwd * (PlayerHeight - CrouchHeight), Color.green);
+                if (Physics.Raycast(transform.position, fwd, out objectHit, (PlayerHeight - CrouchHeight))) {
+                    CController.height = Mathf.Lerp(CController.height, CrouchHeight, Time.deltaTime * 5);
+                    CrouchMult = 0.5f;
+                } else {
+                    CController.height = Mathf.Lerp(CController.height, PlayerHeight, Time.deltaTime * 5);
+                    CrouchMult = 1f;
+                }
+            } else {
+                CController.height = Mathf.Lerp(CController.height, PlayerHeight, Time.deltaTime * 5);
+                CrouchMult = 1f;
+            }
+            
+        }
+
+    }
+
     void Update() {
 
         if (CController != null) {
@@ -46,32 +93,8 @@ public class Movement : MonoBehaviour {
                 enabled = false;
             }
 
-            if ((Input.GetButton("Crouch") || CrouchNeeded) && !isRunning) {
-                CController.height = Mathf.Lerp(CController.height, CrouchHeight, Time.deltaTime * 5);
-                CrouchMult = 0.5f;
-            } else {
-                Vector3 fwd = transform.TransformDirection(Vector3.up);
-                Debug.DrawRay(transform.position, fwd * (PlayerHeight - CrouchHeight), Color.green);
-                if (Physics.Raycast(transform.position, fwd, out objectHit, (PlayerHeight - CrouchHeight))) {
-                    CrouchNeeded = true;
-                } else {
-                    CrouchNeeded = false;
-                }
-
-                CController.height = Mathf.Lerp(CController.height, PlayerHeight, Time.deltaTime * 5);
-                CrouchMult = 1f;
-            }
-
-            if (CrouchNeeded) {
-                Vector3 fwd = transform.TransformDirection(Vector3.up);
-                Debug.DrawRay(transform.position, fwd * (PlayerHeight - CrouchHeight), Color.green);
-                if (Physics.Raycast(transform.position, fwd, out objectHit, (PlayerHeight - CrouchHeight))) {
-                    CrouchNeeded = true;
-                } else {
-                    CrouchNeeded = false;
-                }
-            }
-            
+            //CrouchPress();
+            CrouchHold();
 
             //Ground check
             isGrounded = Physics.CheckSphere(GroundCheckTransform.position, GroundDistance, GroundMask);
